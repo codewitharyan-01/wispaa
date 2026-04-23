@@ -1,1724 +1,717 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Wispa AI — Less Screen. More Life.</title>
-<meta name="description" content="A voice-first AI companion designed to simplify your life. Wispa AI — the wearable that listens, thinks, and delivers answers without the screen." />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
-<style>
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wispa — Your Voice, Amplified</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ws: {
+              bg: '#FAFAF8',
+              surface: '#F3F3F0',
+              dark: '#0A0A0A',
+              text: '#1A1A1A', 
+              sub: '#6B6B76', 
+              muted: '#9CA3AF',
+              border: '#EAEAE6', 
+              accent: '#10B981'
+            }
+          },
+          fontFamily: { inter: ['Inter', 'sans-serif'] },
+        }
+      }
+    }
+  </script>
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#FAFAF8;color:#1A1A1A;overflow-x:hidden}
+    ::selection{background:#0A0A0A;color:#FAFAF8}
+    ::-webkit-scrollbar{width:4px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:#D1D1D6;border-radius:2px}
 
-  :root {
-    --white: #FFFFFF;
-    --soft: #F7F7F8;
-    --black: #0A0A0A;
-    --secondary: #6B7280;
-    --border: #E5E7EB;
-    --accent: #1a1a2e;
-    --blue-dim: rgba(100, 160, 220, 0.12);
-    --ease-cinematic: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  }
+    /* Preloader: Soundwave Concept */
+    #preloader {position:fixed;inset:0;z-index:9999;background:#FAFAF8;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .8s ease,visibility .8s ease}
+    #preloader.hide {opacity:0;visibility:hidden;pointer-events:none}
+    
+    .wave {display:flex;align-items:center;gap:5px; height: 40px; margin-bottom: 24px;}
+    .wave-line {width:4px;background:#1A1A1A;border-radius:4px;animation:wave-anim 1.2s ease-in-out infinite; height: 8px;}
+    .wave-line:nth-child(1) {animation-delay: 0s;}
+    .wave-line:nth-child(2) {animation-delay: 0.1s;}
+    .wave-line:nth-child(3) {animation-delay: 0.2s;}
+    .wave-line:nth-child(4) {animation-delay: 0.3s;}
+    .wave-line:nth-child(5) {animation-delay: 0.4s;}
+    @keyframes wave-anim { 0%, 100% { height: 8px; } 50% { height: 32px; } }
+    
+    .pre-text{opacity:0;animation:pre-fade 1s ease .4s forwards;}
+    @keyframes pre-fade{to{opacity:1}}
 
-  html { scroll-behavior: smooth; }
+    /* Scroll Reveal */
+    .sr{opacity:0;transform:translateY(25px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
+    .sr.in{opacity:1;transform:translateY(0)}
+    .d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}.d5{transition-delay:.5s}
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--white);
-    color: var(--black);
-    overflow-x: hidden;
-    cursor: none;
-  }
+    /* Zen Device Mockup */
+    .device {
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        position: relative;
+        background: radial-gradient(circle at 35% 30%, #FFFFFF 0%, #F5F5F0 40%, #E0E0D8 80%, #C2C2BA 100%);
+        box-shadow: 
+            0 4px 15px rgba(0,0,0,0.03), 
+            0 20px 40px rgba(0,0,0,0.06), 
+            inset 0 6px 12px rgba(255,255,255,1), 
+            inset 0 -10px 24px rgba(0,0,0,0.06);
+        transform-style: preserve-3d;
+        z-index: 10;
+    }
+    .device::after {
+        content: ''; position: absolute; inset: 20px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.03);
+    }
+    .device .led {
+        position: absolute; bottom: 28%; left: 50%; transform: translateX(-50%);
+        width: 5px; height: 5px; border-radius: 50%; background: #10B981;
+        box-shadow: 0 0 10px rgba(16,185,129,0.5);
+        animation: breathing-led 4s ease-in-out infinite;
+    }
+    .device .mic { position: absolute; top: 32%; left: 50%; transform: translateX(-50%); width: 3px; height: 3px; border-radius: 50%; background: rgba(0,0,0,0.15); box-shadow: inset 0 1px 1px rgba(0,0,0,0.2); }
+    
+    @keyframes breathing-led { 0%, 100% { opacity: 0.4; transform: translateX(-50%) scale(1); } 50% { opacity: 1; transform: translateX(-50%) scale(1.2); } }
+    @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-  /* Custom cursor */
-  #cursor {
-    position: fixed;
-    width: 8px; height: 8px;
-    background: var(--black);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9999;
-    transition: transform 0.15s ease, opacity 0.3s ease;
-    transform: translate(-50%, -50%);
-  }
-  #cursor-ring {
-    position: fixed;
-    width: 36px; height: 36px;
-    border: 1px solid rgba(10,10,10,0.25);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9998;
-    transition: transform 0.4s var(--ease-cinematic), width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
-    transform: translate(-50%, -50%);
-  }
-  body:hover #cursor { opacity: 1; }
+    .dev-sm { width: 140px; height: 140px; }
+    .dev-sm::after { inset: 12px; }
 
-  /* NAV */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0;
-    z-index: 1000;
-    padding: 28px 60px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    mix-blend-mode: multiply;
-  }
-  .nav-logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 22px;
-    font-weight: 400;
-    letter-spacing: 0.08em;
-    color: var(--black);
-    text-decoration: none;
-  }
-  .nav-links {
-    display: flex;
-    gap: 40px;
-    list-style: none;
-  }
-  .nav-links a {
-    font-size: 13px;
-    font-weight: 400;
-    letter-spacing: 0.06em;
-    color: var(--secondary);
-    text-decoration: none;
-    transition: color 0.3s ease;
-  }
-  .nav-links a:hover { color: var(--black); }
-  .nav-cta {
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    color: var(--black);
-    text-decoration: none;
-    border-bottom: 1px solid var(--black);
-    padding-bottom: 1px;
-  }
+    /* Lanyard */
+    .lanyard{position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:1.5px;height:40px;background:linear-gradient(to bottom,transparent,rgba(0,0,0,0.2))}
+    .lanyard::after{content:'';position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:16px;height:16px;border-radius:50%;border:2px solid rgba(0,0,0,0.15);background:#FAFAF8}
 
-  /* SECTION SHARED */
-  section { position: relative; }
+    /* Sound Ripples Animation */
+    .ripple-wrap {
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1;
+    }
+    .ripple {
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        border-radius: 50%; border: 1px solid rgba(0,0,0,0.04);
+        opacity: 0; animation: ripple-anim 6s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+    }
+    .ripple:nth-child(2) { animation-delay: 2s; }
+    .ripple:nth-child(3) { animation-delay: 4s; }
+    
+    @keyframes ripple-anim {
+        0% { width: 220px; height: 220px; opacity: 1; border-width: 1.5px; }
+        100% { width: 600px; height: 600px; opacity: 0; border-width: 0.5px; }
+    }
 
-  /* ─────────────────────────────────────────────────
-     SECTION 1 — HERO
-  ───────────────────────────────────────────────── */
-  #hero {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    background: var(--white);
-    padding: 120px 40px 80px;
-    overflow: hidden;
-  }
-  .hero-eyebrow {
-    font-size: 11px;
-    letter-spacing: 0.22em;
-    color: var(--secondary);
-    text-transform: uppercase;
-    margin-bottom: 40px;
-    opacity: 0;
-    animation: fadeUp 1.4s var(--ease-cinematic) 0.3s forwards;
-  }
-  .hero-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(56px, 9vw, 120px);
-    font-weight: 300;
-    line-height: 1.0;
-    letter-spacing: -0.02em;
-    color: var(--black);
-    margin-bottom: 28px;
-    opacity: 0;
-    animation: fadeUp 1.6s var(--ease-cinematic) 0.5s forwards;
-  }
-  .hero-sub {
-    font-size: 16px;
-    font-weight: 300;
-    color: var(--secondary);
-    max-width: 420px;
-    line-height: 1.8;
-    margin-bottom: 60px;
-    opacity: 0;
-    animation: fadeUp 1.6s var(--ease-cinematic) 0.8s forwards;
-  }
-  .hero-device-wrap {
-    position: relative;
-    width: 220px; height: 220px;
-    margin: 0 auto 70px;
-    opacity: 0;
-    animation: fadeUp 2s var(--ease-cinematic) 0.4s forwards;
-  }
-  .hero-device-wrap::after {
-    content: '';
-    position: absolute;
-    bottom: -20px; left: 50%;
-    transform: translateX(-50%);
-    width: 140px; height: 24px;
-    background: radial-gradient(ellipse, rgba(0,0,0,0.12) 0%, transparent 70%);
-    border-radius: 50%;
-    animation: shadowPulse 4s ease-in-out infinite;
-  }
-  .hero-device {
-    width: 200px; height: 200px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 40% 35%, #2a2a3e 0%, #111118 50%, #0a0a12 100%);
-    box-shadow:
-      0 0 0 1px rgba(255,255,255,0.06),
-      0 40px 80px rgba(0,0,0,0.28),
-      0 0 60px rgba(80,160,255,0.08),
-      inset 0 1px 0 rgba(255,255,255,0.08);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: float 6s ease-in-out infinite;
-    position: relative;
-    cursor: pointer;
-  }
-  .hero-device::before {
-    content: '';
-    position: absolute;
-    inset: 12px;
-    border-radius: 50%;
-    border: 1px solid rgba(100,180,255,0.15);
-    animation: ringPulse 3s ease-in-out infinite;
-  }
-  .hero-device-ring {
-    position: absolute;
-    inset: 6px;
-    border-radius: 50%;
-    border: 1.5px solid rgba(80,160,255,0.35);
-    box-shadow: 0 0 20px rgba(80,160,255,0.2), inset 0 0 20px rgba(80,160,255,0.05);
-    animation: ringGlow 2s ease-in-out infinite alternate;
-  }
-  .wispa-text {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 400;
-    letter-spacing: 0.16em;
-    color: rgba(255,255,255,0.7);
-    position: relative;
-    z-index: 1;
-  }
-  .hero-wave {
-    position: absolute;
-    bottom: 28px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 3px;
-    align-items: center;
-  }
-  .hero-wave span {
-    display: block;
-    width: 2px;
-    border-radius: 2px;
-    background: rgba(80,160,255,0.6);
-    animation: waveBar 1.2s ease-in-out infinite;
-  }
-  .hero-wave span:nth-child(1) { height: 6px; animation-delay: 0s; }
-  .hero-wave span:nth-child(2) { height: 14px; animation-delay: 0.1s; }
-  .hero-wave span:nth-child(3) { height: 10px; animation-delay: 0.2s; }
-  .hero-wave span:nth-child(4) { height: 18px; animation-delay: 0.3s; }
-  .hero-wave span:nth-child(5) { height: 10px; animation-delay: 0.4s; }
-  .hero-wave span:nth-child(6) { height: 14px; animation-delay: 0.5s; }
-  .hero-wave span:nth-child(7) { height: 6px; animation-delay: 0.6s; }
+    /* Buttons */
+    .btn-primary {
+        display:inline-flex;align-items:center;justify-content:center;padding:0 32px;height:48px;border-radius:9999px;
+        background:#1A1A1A;color:#fff;font-size:13px;font-weight:500;letter-spacing:-.01em;
+        transition:all .4s cubic-bezier(0.16,1,.3,1);border:none;cursor:pointer;
+    }
+    .btn-primary:hover {transform:translateY(-2px);box-shadow:0 10px 25px rgba(0,0,0,.12);background:#000;}
+    .btn-primary:active {transform:translateY(0) scale(0.98);}
+    
+    .btn-ghost {
+        display:inline-flex;align-items:center;justify-content:center;padding:0 32px;height:48px;border-radius:9999px;
+        background:transparent;color:#1A1A1A;font-size:13px;font-weight:500;letter-spacing:-.01em;
+        border:1px solid #D1D1D6;transition:all .4s cubic-bezier(0.16,1,.3,1);cursor:pointer;
+    }
+    .btn-ghost:hover {background:#F3F3F0;border-color:#1A1A1A;transform:translateY(-2px);}
 
-  .hero-buttons {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    opacity: 0;
-    animation: fadeUp 1.6s var(--ease-cinematic) 1.1s forwards;
-  }
-  .btn-primary {
-    background: var(--black);
-    color: var(--white);
-    border: none;
-    padding: 16px 40px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    text-decoration: none;
-  }
-  .btn-primary:hover { opacity: 0.75; transform: translateY(-1px); }
-  .btn-ghost {
-    background: transparent;
-    color: var(--black);
-    border: 1px solid var(--border);
-    padding: 16px 40px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: border-color 0.3s ease, transform 0.3s ease;
-    text-decoration: none;
-  }
-  .btn-ghost:hover { border-color: var(--black); transform: translateY(-1px); }
+    /* Minimalist Cards */
+    .card-mini {
+        background: #FFFFFF;
+        border: 1px solid #F0F0EA;
+        border-radius: 20px;
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .card-mini:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.03);
+        border-color: #E5E5DF;
+    }
 
-  .scroll-hint {
-    position: absolute;
-    bottom: 32px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    opacity: 0;
-    animation: fadeIn 1s ease 2.5s forwards;
-  }
-  .scroll-hint span {
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--secondary);
-  }
-  .scroll-line {
-    width: 1px;
-    height: 40px;
-    background: linear-gradient(to bottom, var(--border), transparent);
-    animation: scrollDrop 2s ease-in-out infinite;
-  }
+    /* Navigation */
+    .nav-l {position:relative;color:#6B6B76;transition:color .3s ease;}
+    .nav-l::after {content:'';position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);width:0;height:1.5px;background:#1A1A1A;transition:width .3s ease;}
+    .nav-l:hover {color:#1A1A1A;}
+    .nav-l:hover::after {width:100%;}
 
-  /* ─────────────────────────────────────────────────
-     SECTION 2 — NOISE
-  ───────────────────────────────────────────────── */
-  #noise {
-    min-height: 100vh;
-    background: var(--white);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .noise-container {
-    position: relative;
-    width: 100%;
-    max-width: 600px;
-    height: 500px;
-    margin: 0 auto;
-  }
-  .notification-card {
-    position: absolute;
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 14px 18px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
-    opacity: 0;
-    min-width: 240px;
-    transition: all 0.4s ease;
-  }
-  .notif-icon {
-    width: 36px; height: 36px;
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-    flex-shrink: 0;
-  }
-  .notif-content { flex: 1; }
-  .notif-app { font-size: 10px; font-weight: 500; color: var(--secondary); letter-spacing: 0.05em; }
-  .notif-msg { font-size: 13px; color: var(--black); margin-top: 2px; line-height: 1.4; }
-  .notif-time { font-size: 10px; color: var(--secondary); flex-shrink: 0; }
+    /* Horizontal Use Cases Scroll */
+    .uc-track {display:flex;gap:24px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:24px 0;}
+    .uc-track::-webkit-scrollbar{height:0}
+    .uc-item {scroll-snap-align:start;flex:0 0 300px;border-radius:20px;background:#F9F9F8;padding:32px;transition:all .4s ease;}
+    .uc-item:hover {background:#FFFFFF;box-shadow:0 15px 40px rgba(0,0,0,.04);transform:translateY(-5px);}
 
-  .noise-statement {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(32px, 5vw, 56px);
-    font-weight: 300;
-    line-height: 1.2;
-    text-align: center;
-    max-width: 600px;
-    padding: 0 40px;
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 1.6s var(--ease-cinematic), transform 1.6s var(--ease-cinematic);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, calc(-50% + 30px));
-  }
-  .noise-statement.visible {
-    opacity: 1;
-    transform: translate(-50%, -50%);
-  }
+    /* Specs rows */
+    .spec-r {display:flex;justify-content:space-between;padding:16px 0;border-bottom:1px solid #F0F0EA;}
+    .spec-r:last-child {border-bottom:none;}
+    
+    .rm-dot {width:10px;height:10px;border-radius:50%; flex-shrink:0;}
+    .rm-line {width:1px;background:#EAEAE6;flex-shrink:0;}
 
-  /* ─────────────────────────────────────────────────
-     SECTION 3 — TRANSITION
-  ───────────────────────────────────────────────── */
-  #transition-section {
-    min-height: 70vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--white);
-  }
-  .transition-text {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(28px, 4.5vw, 52px);
-    font-weight: 300;
-    font-style: italic;
-    text-align: center;
-    color: var(--black);
-    line-height: 1.3;
-    max-width: 560px;
-    padding: 0 40px;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 1.8s var(--ease-cinematic), transform 1.8s var(--ease-cinematic);
-  }
-  .transition-text.visible { opacity: 1; transform: translateY(0); }
-  .transition-device {
-    display: flex;
-    justify-content: center;
-    margin-top: 70px;
-    opacity: 0;
-    transform: scale(0.9);
-    transition: opacity 1.6s var(--ease-cinematic) 0.4s, transform 1.6s var(--ease-cinematic) 0.4s;
-  }
-  .transition-device.visible { opacity: 1; transform: scale(1); }
-  .mini-device {
-    width: 90px; height: 90px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 40% 35%, #2a2a3e 0%, #111118 50%, #0a0a12 100%);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.2), 0 0 40px rgba(80,160,255,0.1);
-    display: flex; align-items: center; justify-content: center;
-    position: relative;
-  }
-  .mini-device::before {
-    content: '';
-    position: absolute;
-    inset: 4px;
-    border-radius: 50%;
-    border: 1px solid rgba(80,160,255,0.4);
-    box-shadow: 0 0 10px rgba(80,160,255,0.2);
-  }
-  .mini-device-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: rgba(80,160,255,0.8);
-    box-shadow: 0 0 8px rgba(80,160,255,0.6);
-    animation: pulse 2s ease-in-out infinite;
-  }
+    /* Typography Utilities */
+    .text-balance { text-wrap: balance; }
 
-  /* ─────────────────────────────────────────────────
-     SECTION 4 — VOICE INTERACTION
-  ───────────────────────────────────────────────── */
-  #voice-demo {
-    min-height: 100vh;
-    background: var(--soft);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 120px 40px;
-  }
-  .voice-inner {
-    max-width: 680px;
-    width: 100%;
-    margin: 0 auto;
-  }
-  .section-label {
-    font-size: 10px;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: var(--secondary);
-    margin-bottom: 70px;
-    text-align: center;
-  }
-  .conversation-block {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-  .convo-item {
-    opacity: 0;
-    transform: translateY(16px);
-    transition: opacity 0.9s var(--ease-cinematic), transform 0.9s var(--ease-cinematic);
-    margin-bottom: 48px;
-  }
-  .convo-item.visible { opacity: 1; transform: translateY(0); }
-  .convo-who {
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--secondary);
-    margin-bottom: 12px;
-  }
-  .convo-user {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(22px, 3.5vw, 34px);
-    font-weight: 400;
-    color: var(--black);
-    line-height: 1.3;
-  }
-  .convo-wispa {
-    font-size: 15px;
-    font-weight: 300;
-    color: var(--secondary);
-    line-height: 1.8;
-    padding-left: 20px;
-    border-left: 1px solid var(--border);
-    max-width: 480px;
-  }
-  .divider-line {
-    width: 40px;
-    height: 1px;
-    background: var(--border);
-    margin: 0 0 48px;
-  }
-
-  /* ─────────────────────────────────────────────────
-     SECTION 5 — LIFE STORIES
-  ───────────────────────────────────────────────── */
-  #life-stories {
-    min-height: 100vh;
-    background: var(--white);
-    padding: 140px 60px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .story-heading {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(36px, 5.5vw, 68px);
-    font-weight: 300;
-    text-align: center;
-    line-height: 1.1;
-    max-width: 620px;
-    margin-bottom: 100px;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 1.4s var(--ease-cinematic), transform 1.4s var(--ease-cinematic);
-  }
-  .story-heading.visible { opacity: 1; transform: translateY(0); }
-  .stories-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 1px;
-    width: 100%;
-    max-width: 1100px;
-    background: var(--border);
-  }
-  .story-card {
-    background: var(--white);
-    padding: 64px 48px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 1.2s var(--ease-cinematic), transform 1.2s var(--ease-cinematic);
-  }
-  .story-card.visible { opacity: 1; transform: translateY(0); }
-  .story-scene {
-    font-size: 32px;
-    line-height: 1;
-  }
-  .story-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 24px;
-    font-weight: 400;
-    line-height: 1.2;
-    color: var(--black);
-  }
-  .story-desc {
-    font-size: 14px;
-    font-weight: 300;
-    color: var(--secondary);
-    line-height: 1.8;
-  }
-
-  /* ─────────────────────────────────────────────────
-     SECTION 6 — BEFORE / AFTER
-  ───────────────────────────────────────────────── */
-  #before-after {
-    min-height: 80vh;
-    background: var(--white);
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    overflow: hidden;
-  }
-  .ba-side {
-    padding: 100px 80px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 32px;
-    opacity: 0;
-    transition: opacity 1.4s var(--ease-cinematic);
-  }
-  .ba-side.visible { opacity: 1; }
-  .ba-side.before {
-    background: var(--soft);
-  }
-  .ba-label {
-    font-size: 10px;
-    letter-spacing: 0.26em;
-    text-transform: uppercase;
-    color: var(--secondary);
-  }
-  .ba-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(30px, 4vw, 48px);
-    font-weight: 300;
-    line-height: 1.2;
-    color: var(--black);
-  }
-  .ba-items {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-  .ba-items li {
-    font-size: 14px;
-    font-weight: 300;
-    color: var(--secondary);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    line-height: 1.6;
-  }
-  .ba-items li::before {
-    content: '';
-    flex-shrink: 0;
-    width: 4px; height: 4px;
-    border-radius: 50%;
-    background: currentColor;
-  }
-
-  /* ─────────────────────────────────────────────────
-     SECTION 7 — HOW IT WORKS
-  ───────────────────────────────────────────────── */
-  #how-it-works {
-    min-height: 60vh;
-    background: var(--black);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 120px 40px;
-  }
-  .hiw-inner {
-    text-align: center;
-    max-width: 700px;
-  }
-  .hiw-label {
-    font-size: 10px;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.3);
-    margin-bottom: 60px;
-  }
-  .hiw-flow {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 24px;
-    flex-wrap: wrap;
-  }
-  .hiw-step {
-    opacity: 0;
-    transform: translateY(16px);
-    transition: opacity 1s var(--ease-cinematic), transform 1s var(--ease-cinematic);
-  }
-  .hiw-step.visible { opacity: 1; transform: translateY(0); }
-  .hiw-word {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(28px, 5vw, 56px);
-    font-weight: 300;
-    color: rgba(255,255,255,0.9);
-    line-height: 1;
-  }
-  .hiw-arrow {
-    font-size: clamp(18px, 3vw, 28px);
-    color: rgba(255,255,255,0.2);
-    opacity: 0;
-    transition: opacity 1s var(--ease-cinematic) 0.3s;
-    align-self: center;
-  }
-  .hiw-arrow.visible { opacity: 1; }
-  .hiw-sub {
-    font-size: 14px;
-    font-weight: 300;
-    color: rgba(255,255,255,0.35);
-    margin-top: 12px;
-  }
-
-  /* ─────────────────────────────────────────────────
-     SECTION 8 — DESIGN PHILOSOPHY
-  ───────────────────────────────────────────────── */
-  #design-philosophy {
-    padding: 160px 80px;
-    background: var(--white);
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 100px;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  .dp-device-wrap {
-    display: flex;
-    justify-content: center;
-    opacity: 0;
-    transform: scale(0.93);
-    transition: opacity 1.4s var(--ease-cinematic), transform 1.4s var(--ease-cinematic);
-  }
-  .dp-device-wrap.visible { opacity: 1; transform: scale(1); }
-  .dp-device {
-    width: 180px; height: 180px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 40% 35%, #2a2a3e 0%, #111118 50%, #0a0a12 100%);
-    box-shadow: 0 40px 100px rgba(0,0,0,0.22), 0 0 60px rgba(80,160,255,0.08);
-    position: relative;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .dp-device::before {
-    content: '';
-    position: absolute;
-    inset: 8px; border-radius: 50%;
-    border: 1px solid rgba(80,160,255,0.25);
-  }
-  .dp-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: rgba(80,160,255,0.7);
-    box-shadow: 0 0 12px rgba(80,160,255,0.5);
-    animation: pulse 2.4s ease-in-out infinite;
-  }
-  .dp-content {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 1.4s var(--ease-cinematic) 0.3s, transform 1.4s var(--ease-cinematic) 0.3s;
-  }
-  .dp-content.visible { opacity: 1; transform: translateY(0); }
-  .dp-label {
-    font-size: 10px;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: var(--secondary);
-    margin-bottom: 40px;
-  }
-  .dp-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(30px, 4vw, 48px);
-    font-weight: 300;
-    line-height: 1.2;
-    color: var(--black);
-    margin-bottom: 40px;
-  }
-  .dp-points {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-  }
-  .dp-points li {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .dp-points .dp-q {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--black);
-    letter-spacing: 0.02em;
-  }
-  .dp-points .dp-a {
-    font-size: 14px;
-    font-weight: 300;
-    color: var(--secondary);
-    line-height: 1.7;
-  }
-
-  /* ─────────────────────────────────────────────────
-     SECTION 9 — PRIVACY
-  ───────────────────────────────────────────────── */
-  #privacy {
-    background: var(--soft);
-    padding: 140px 60px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 80px;
-  }
-  .privacy-header {
-    max-width: 520px;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 1.4s var(--ease-cinematic), transform 1.4s var(--ease-cinematic);
-  }
-  .privacy-header.visible { opacity: 1; transform: translateY(0); }
-  .privacy-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(32px, 5vw, 56px);
-    font-weight: 300;
-    line-height: 1.2;
-    color: var(--black);
-    margin-bottom: 20px;
-  }
-  .privacy-sub {
-    font-size: 15px;
-    font-weight: 300;
-    color: var(--secondary);
-    line-height: 1.8;
-  }
-  .privacy-pillars {
-    display: flex;
-    gap: 1px;
-    background: var(--border);
-    max-width: 900px;
-    width: 100%;
-  }
-  .pillar {
-    flex: 1;
-    background: var(--soft);
-    padding: 48px 36px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    text-align: left;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 1.2s var(--ease-cinematic), transform 1.2s var(--ease-cinematic);
-  }
-  .pillar.visible { opacity: 1; transform: translateY(0); }
-  .pillar-icon { font-size: 24px; }
-  .pillar-title {
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--black);
-    letter-spacing: 0.02em;
-  }
-  .pillar-desc {
-    font-size: 13px;
-    font-weight: 300;
-    color: var(--secondary);
-    line-height: 1.7;
-  }
-
-  /* ─────────────────────────────────────────────────
-     SECTION 10 — FOUNDERS
-  ───────────────────────────────────────────────── */
-  #founders {
-    padding: 160px 80px;
-    background: var(--white);
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-  .founders-header {
-    margin-bottom: 80px;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 1.4s var(--ease-cinematic), transform 1.4s var(--ease-cinematic);
-  }
-  .founders-header.visible { opacity: 1; transform: translateY(0); }
-  .founders-eyebrow {
-    font-size: 10px;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: var(--secondary);
-    margin-bottom: 20px;
-  }
-  .founders-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(28px, 4vw, 48px);
-    font-weight: 300;
-    line-height: 1.3;
-    max-width: 520px;
-    color: var(--black);
-  }
-  .founders-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 40px;
-  }
-  .founder-card {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 1.2s var(--ease-cinematic), transform 1.2s var(--ease-cinematic);
-  }
-  .founder-card.visible { opacity: 1; transform: translateY(0); }
-  .founder-avatar {
-    width: 100%;
-    aspect-ratio: 1;
-    background: var(--soft);
-    border-radius: 4px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-  }
-  .founder-initials {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 48px;
-    font-weight: 300;
-    color: rgba(10,10,10,0.2);
-    letter-spacing: 0.05em;
-  }
-  .founder-name {
-    font-size: 16px;
-    font-weight: 500;
-    color: var(--black);
-    letter-spacing: 0.02em;
-  }
-  .founder-role {
-    font-size: 12px;
-    font-weight: 400;
-    color: var(--secondary);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    margin-top: 2px;
-  }
-  .founder-quote {
-    font-size: 14px;
-    font-weight: 300;
-    color: var(--secondary);
-    line-height: 1.7;
-    font-style: italic;
-  }
-
-  /* ─────────────────────────────────────────────────
-     SECTION 11 — PRE-ORDER FORM
-  ───────────────────────────────────────────────── */
-  #preorder {
-    background: var(--soft);
-    padding: 140px 60px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-  .preorder-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(36px, 5.5vw, 64px);
-    font-weight: 300;
-    line-height: 1.1;
-    max-width: 560px;
-    margin-bottom: 16px;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 1.4s var(--ease-cinematic), transform 1.4s var(--ease-cinematic);
-  }
-  .preorder-title.visible { opacity: 1; transform: translateY(0); }
-  .preorder-sub {
-    font-size: 15px;
-    font-weight: 300;
-    color: var(--secondary);
-    margin-bottom: 60px;
-    opacity: 0;
-    transition: opacity 1.4s var(--ease-cinematic) 0.2s;
-  }
-  .preorder-sub.visible { opacity: 1; }
-  .preorder-form {
-    display: flex;
-    gap: 0;
-    max-width: 480px;
-    width: 100%;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 1.2s var(--ease-cinematic) 0.4s, transform 1.2s var(--ease-cinematic) 0.4s;
-  }
-  .preorder-form.visible { opacity: 1; transform: translateY(0); }
-  .preorder-input {
-    flex: 1;
-    padding: 18px 24px;
-    border: 1px solid var(--border);
-    border-right: none;
-    background: var(--white);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: var(--black);
-    outline: none;
-    transition: border-color 0.3s ease;
-  }
-  .preorder-input::placeholder { color: var(--secondary); }
-  .preorder-input:focus { border-color: var(--black); }
-  .preorder-btn {
-    background: var(--black);
-    color: var(--white);
-    border: 1px solid var(--black);
-    padding: 18px 32px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: opacity 0.3s ease;
-  }
-  .preorder-btn:hover { opacity: 0.75; }
-  .preorder-note {
-    margin-top: 20px;
-    font-size: 12px;
-    color: var(--secondary);
-    opacity: 0;
-    transition: opacity 1.2s var(--ease-cinematic) 0.6s;
-  }
-  .preorder-note.visible { opacity: 1; }
-
-  /* ─────────────────────────────────────────────────
-     SECTION 12 — FINAL CTA
-  ───────────────────────────────────────────────── */
-  #final-cta {
-    min-height: 80vh;
-    background: var(--black);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 100px 40px;
-    position: relative;
-    overflow: hidden;
-  }
-  .final-cta-bg {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at 50% 60%, rgba(80,160,255,0.04) 0%, transparent 60%);
-    pointer-events: none;
-  }
-  .final-device-glow {
-    width: 140px; height: 140px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 40% 35%, #2a2a3e 0%, #111118 50%, #0a0a12 100%);
-    box-shadow: 0 0 80px rgba(80,160,255,0.15), 0 40px 80px rgba(0,0,0,0.5);
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 60px;
-    position: relative;
-    animation: float 6s ease-in-out infinite;
-    opacity: 0;
-    transition: opacity 1.4s var(--ease-cinematic);
-  }
-  .final-device-glow.visible { opacity: 1; }
-  .final-device-glow::before {
-    content: '';
-    position: absolute; inset: 6px; border-radius: 50%;
-    border: 1px solid rgba(80,160,255,0.3);
-    box-shadow: 0 0 20px rgba(80,160,255,0.2);
-  }
-  .final-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: rgba(80,160,255,0.8);
-    box-shadow: 0 0 12px rgba(80,160,255,0.6);
-    animation: pulse 2s ease-in-out infinite;
-  }
-  .final-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(36px, 6vw, 72px);
-    font-weight: 300;
-    line-height: 1.1;
-    color: rgba(255,255,255,0.9);
-    max-width: 580px;
-    margin-bottom: 48px;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 1.6s var(--ease-cinematic) 0.3s, transform 1.6s var(--ease-cinematic) 0.3s;
-  }
-  .final-title.visible { opacity: 1; transform: translateY(0); }
-  .final-btn {
-    background: rgba(255,255,255,0.08);
-    color: rgba(255,255,255,0.9);
-    border: 1px solid rgba(255,255,255,0.15);
-    padding: 18px 52px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    cursor: pointer;
-    text-decoration: none;
-    transition: background 0.4s ease, border-color 0.4s ease;
-    opacity: 0;
-    transition: opacity 1.4s var(--ease-cinematic) 0.6s, background 0.4s ease, border-color 0.4s ease;
-    display: inline-block;
-  }
-  .final-btn.visible { opacity: 1; }
-  .final-btn:hover {
-    background: rgba(255,255,255,0.14);
-    border-color: rgba(255,255,255,0.3);
-  }
-
-  /* ─────────────────────────────────────────────────
-     FOOTER
-  ───────────────────────────────────────────────── */
-  footer {
-    background: #F0F0F1;
-    padding: 80px 80px 40px;
-  }
-  .footer-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
-    gap: 60px;
-    margin-bottom: 60px;
-  }
-  .footer-brand-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 24px;
-    font-weight: 400;
-    color: var(--black);
-    margin-bottom: 16px;
-    letter-spacing: 0.06em;
-  }
-  .footer-brand-desc {
-    font-size: 13px;
-    font-weight: 300;
-    color: var(--secondary);
-    line-height: 1.8;
-    max-width: 280px;
-    margin-bottom: 28px;
-  }
-  .footer-social {
-    display: flex;
-    gap: 16px;
-    list-style: none;
-  }
-  .footer-social a {
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--secondary);
-    text-decoration: none;
-    transition: color 0.3s ease;
-  }
-  .footer-social a:hover { color: var(--black); }
-  .footer-col-title {
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--black);
-    margin-bottom: 24px;
-  }
-  .footer-links {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .footer-links a {
-    font-size: 13px;
-    font-weight: 300;
-    color: var(--secondary);
-    text-decoration: none;
-    transition: color 0.3s ease;
-  }
-  .footer-links a:hover { color: var(--black); }
-  .footer-bottom {
-    border-top: 1px solid var(--border);
-    padding-top: 32px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
-  .footer-copy {
-    font-size: 12px;
-    color: var(--secondary);
-    font-weight: 300;
-  }
-  .footer-legal {
-    display: flex;
-    gap: 24px;
-    list-style: none;
-  }
-  .footer-legal a {
-    font-size: 12px;
-    color: var(--secondary);
-    text-decoration: none;
-    transition: color 0.3s ease;
-  }
-  .footer-legal a:hover { color: var(--black); }
-
-  /* ─────────────────────────────────────────────────
-     ANIMATIONS
-  ───────────────────────────────────────────────── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-14px); }
-  }
-  @keyframes shadowPulse {
-    0%, 100% { transform: translateX(-50%) scaleX(1); opacity: 1; }
-    50% { transform: translateX(-50%) scaleX(0.7); opacity: 0.5; }
-  }
-  @keyframes ringPulse {
-    0%, 100% { opacity: 0.5; }
-    50% { opacity: 1; }
-  }
-  @keyframes ringGlow {
-    from { box-shadow: 0 0 10px rgba(80,160,255,0.15), inset 0 0 10px rgba(80,160,255,0.03); }
-    to { box-shadow: 0 0 30px rgba(80,160,255,0.35), inset 0 0 20px rgba(80,160,255,0.08); }
-  }
-  @keyframes waveBar {
-    0%, 100% { transform: scaleY(0.5); opacity: 0.5; }
-    50% { transform: scaleY(1); opacity: 1; }
-  }
-  @keyframes scrollDrop {
-    0% { transform: scaleY(0); transform-origin: top; }
-    50% { transform: scaleY(1); transform-origin: top; }
-    51% { transform-origin: bottom; }
-    100% { transform: scaleY(0); transform-origin: bottom; }
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 0.6; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.15); }
-  }
-  @keyframes notifIn {
-    from { opacity: 0; transform: translateX(20px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-  @keyframes notifOut {
-    from { opacity: 1; }
-    to { opacity: 0; transform: scale(0.95) translateY(-10px); }
-  }
-
-  /* RESPONSIVE */
-  @media (max-width: 900px) {
-    nav { padding: 24px 30px; }
-    .nav-links { display: none; }
-    #design-philosophy { grid-template-columns: 1fr; gap: 60px; padding: 100px 40px; }
-    #before-after { grid-template-columns: 1fr; }
-    .stories-grid { grid-template-columns: 1fr; }
-    .founders-grid { grid-template-columns: 1fr; }
-    .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
-    .privacy-pillars { flex-direction: column; }
-    .preorder-form { flex-direction: column; }
-    .preorder-input { border-right: 1px solid var(--border); border-bottom: none; }
-    #life-stories { padding: 100px 30px; }
-    #founders { padding: 100px 30px; }
-    footer { padding: 60px 30px 30px; }
-    .ba-side { padding: 70px 40px; }
-    .hiw-flow { flex-direction: column; gap: 8px; }
-  }
-  @media (max-width: 600px) {
-    .footer-grid { grid-template-columns: 1fr; }
-    .footer-bottom { flex-direction: column; align-items: flex-start; }
-    .hero-buttons { flex-direction: column; align-items: center; }
-  }
-</style>
+    @media(max-width:768px){
+      .device { width: 160px; height: 160px; }
+      @keyframes ripple-anim {
+        0% { width: 160px; height: 160px; opacity: 1;}
+        100% { width: 400px; height: 400px; opacity: 0;}
+      }
+    }
+  </style>
 </head>
 <body>
 
-<!-- CURSOR -->
-<div id="cursor"></div>
-<div id="cursor-ring"></div>
+<!-- ===== PRELOADER ===== -->
+<div id="preloader">
+  <div class="wave">
+    <div class="wave-line"></div>
+    <div class="wave-line"></div>
+    <div class="wave-line"></div>
+    <div class="wave-line"></div>
+    <div class="wave-line"></div>
+  </div>
+  <p class="pre-text text-[11px] font-semibold tracking-[0.2em] uppercase text-ws-muted mt-2">Awakening Wispa</p>
+</div>
 
-<!-- NAV -->
-<nav>
-  <a href="#" class="nav-logo">Wispa</a>
-  <ul class="nav-links">
-    <li><a href="#voice-demo">Experience</a></li>
-    <li><a href="#design-philosophy">Design</a></li>
-    <li><a href="#privacy">Privacy</a></li>
-    <li><a href="#founders">Team</a></li>
-  </ul>
-  <a href="#preorder" class="nav-cta">Pre-order</a>
+<!-- ===== NAVBAR ===== -->
+<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 bg-transparent">
+  <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+    <a href="#hero" class="flex items-center gap-2.5 flex-shrink-0 group">
+      <div class="w-2.5 h-2.5 rounded-full bg-ws-dark group-hover:scale-150 transition-transform duration-300"></div>
+      <span class="font-semibold text-sm tracking-widest uppercase">Wispa</span>
+    </a>
+    <div class="hidden md:flex items-center gap-8">
+      <a href="#hero" class="nav-l text-[11px] font-semibold uppercase tracking-widest">Home</a>
+      <a href="#solution" class="nav-l text-[11px] font-semibold uppercase tracking-widest">Device</a>
+      <a href="#features" class="nav-l text-[11px] font-semibold uppercase tracking-widest">Features</a>
+      <a href="#how" class="nav-l text-[11px] font-semibold uppercase tracking-widest">Logic</a>
+      <a href="#pricing" class="nav-l text-[11px] font-semibold uppercase tracking-widest">Order</a>
+    </div>
+    <div class="flex items-center gap-4">
+      <a href="#order" class="btn-primary text-xs hidden sm:inline-flex !h-9 !px-6">Pre-Order</a>
+      <button id="mob-btn" class="md:hidden text-ws-dark p-1" aria-label="Menu">
+        <span class="iconify" data-icon="lucide:menu" data-width="22"></span>
+      </button>
+    </div>
+  </div>
+  
+  <div id="mob-menu" class="md:hidden hidden bg-white/95 backdrop-blur-xl border-t border-ws-border shadow-[0_20px_40px_rgba(0,0,0,0.05)] absolute w-full">
+    <div class="flex flex-col gap-6 p-8">
+      <a href="#hero" class="text-xs font-semibold uppercase tracking-widest text-ws-sub hover:text-ws-dark transition-colors mob-link">Home</a>
+      <a href="#solution" class="text-xs font-semibold uppercase tracking-widest text-ws-sub hover:text-ws-dark transition-colors mob-link">Device</a>
+      <a href="#features" class="text-xs font-semibold uppercase tracking-widest text-ws-sub hover:text-ws-dark transition-colors mob-link">Features</a>
+      <a href="#pricing" class="text-xs font-semibold uppercase tracking-widest text-ws-sub hover:text-ws-dark transition-colors mob-link">Pricing</a>
+      <a href="#order" class="btn-primary text-xs text-center mt-2 w-full">Pre-Order Now</a>
+    </div>
+  </div>
 </nav>
 
-<!-- SECTION 1 — HERO -->
-<section id="hero">
-  <div class="hero-eyebrow">Introducing Wispa AI — Voice-First Intelligence</div>
-
-  <div class="hero-device-wrap">
-    <div class="hero-device">
-      <div class="hero-device-ring"></div>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:12px;position:relative;z-index:1;">
-        <span class="wispa-text">WISPA</span>
-        <div class="hero-wave">
-          <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+<!-- ===== HERO ===== -->
+<section id="hero" class="min-h-screen flex items-center justify-center pt-24 pb-16 overflow-hidden">
+  <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 md:gap-24 items-center">
+    
+    <div class="order-2 md:order-1 relative z-10">
+      <div class="flex items-center gap-3 mb-8 sr">
+        <div class="w-1.5 h-1.5 rounded-full bg-ws-accent animate-pulse"></div>
+        <p class="text-[10px] font-bold text-ws-sub uppercase tracking-[0.2em]">The Screenless Revolution</p>
+      </div>
+      <h1 class="text-5xl md:text-[64px] lg:text-[76px] font-bold tracking-tight leading-[1] mb-6 sr d1 text-ws-dark">
+        Your Voice.<br>
+        <span class="text-ws-muted font-light">Amplified.</span>
+      </h1>
+      <p class="text-[15px] font-medium text-ws-sub leading-relaxed mb-10 max-w-sm sr d2 text-balance">
+        An elegant wearable that naturally listens, thinks, and responds. Freeing you entirely from the digital noise.
+      </p>
+      <div class="flex flex-wrap gap-4 sr d3">
+        <a href="#order" class="btn-primary">Reserve Edition 01</a>
+        <a href="#solution" class="btn-ghost group">
+          Discover
+          <span class="iconify ml-2 group-hover:translate-x-1 transition-transform" data-icon="lucide:arrow-right" data-width="16"></span>
+        </a>
+      </div>
+    </div>
+    
+    <div class="order-1 md:order-2 flex justify-center sr d2 relative h-[300px] md:h-[400px]">
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style="animation: floating 6s ease-in-out infinite;">
+        <!-- Sound Ripples -->
+        <div class="ripple-wrap">
+          <div class="ripple"></div>
+          <div class="ripple"></div>
+          <div class="ripple"></div>
+        </div>
+        
+        <!-- The Device -->
+        <div class="device">
+          <div class="lanyard"></div>
+          <div class="mic"></div>
+          <div class="led"></div>
         </div>
       </div>
     </div>
-  </div>
-
-  <h1 class="hero-title">Less Screen.<br/>More Life.</h1>
-  <p class="hero-sub">A voice-first AI companion designed to simplify your life — without demanding your attention.</p>
-
-  <div class="hero-buttons">
-    <a href="#preorder" class="btn-primary">Pre-order Now</a>
-    <a href="#voice-demo" class="btn-ghost">Watch Demo</a>
-  </div>
-
-  <div class="scroll-hint">
-    <span>Scroll</span>
-    <div class="scroll-line"></div>
+    
   </div>
 </section>
 
-<!-- SECTION 2 — NOISE -->
-<section id="noise">
-  <div class="noise-container" id="noiseContainer">
-    <!-- notifications added via JS -->
-  </div>
-  <p class="noise-statement" id="noiseStatement">We were never meant to live like this.</p>
-</section>
-
-<!-- SECTION 3 — TRANSITION -->
-<section id="transition-section">
-  <div style="display:flex;flex-direction:column;align-items:center;">
-    <p class="transition-text" id="transitionText">So we built<br/><em>something better.</em></p>
-    <div class="transition-device" id="transitionDevice" style="margin-top:60px;">
-      <div class="mini-device">
-        <div class="mini-device-dot"></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- SECTION 4 — VOICE INTERACTION -->
-<section id="voice-demo">
-  <div class="voice-inner">
-    <div class="section-label">Voice Experience</div>
-    <div class="conversation-block">
-
-      <div class="convo-item" data-delay="0">
-        <div class="convo-who">You</div>
-        <div class="convo-user">"Hey Wispa, what's my schedule today?"</div>
-      </div>
-      <div class="convo-item" data-delay="150">
-        <div class="convo-who">Wispa</div>
-        <div class="convo-wispa">You have a team standup at 10 AM, lunch with Priya at 1 PM, and a focus block until 5 PM. You're free after that.</div>
-      </div>
-
-      <div class="divider-line"></div>
-
-      <div class="convo-item" data-delay="300">
-        <div class="convo-who">You</div>
-        <div class="convo-user">"Remind me to call Mom at 7 PM."</div>
-      </div>
-      <div class="convo-item" data-delay="450">
-        <div class="convo-who">Wispa</div>
-        <div class="convo-wispa">Done. I'll remind you at 7 PM this evening.</div>
-      </div>
-
-      <div class="divider-line"></div>
-
-      <div class="convo-item" data-delay="600">
-        <div class="convo-who">You</div>
-        <div class="convo-user">"What's the fastest route to the airport?"</div>
-      </div>
-      <div class="convo-item" data-delay="750">
-        <div class="convo-who">Wispa</div>
-        <div class="convo-wispa">Via NH48, about 38 minutes right now. Traffic is light. I'd leave by 2:15 PM to be safe.</div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- SECTION 5 — LIFE STORIES -->
-<section id="life-stories">
-  <h2 class="story-heading" id="storyHeading">Life, without the noise.</h2>
-  <div class="stories-grid">
-    <div class="story-card" data-delay="0">
-      <div class="story-scene">📚</div>
-      <div class="story-title">The focused student</div>
-      <div class="story-desc">Neha studies for 4 hours without touching her phone. Wispa handles her reminders, answers her doubts, and keeps her on schedule. No interruptions. Pure focus.</div>
-    </div>
-    <div class="story-card" data-delay="150">
-      <div class="story-scene">🚶</div>
-      <div class="story-title">The free walk</div>
-      <div class="story-desc">Arjun walks in the park. No earphones. No phone in hand. Just Wispa on his bag strap, quietly there — ready when he needs it, invisible when he doesn't.</div>
-    </div>
-    <div class="story-card" data-delay="300">
-      <div class="story-scene">💼</div>
-      <div class="story-title">The deep worker</div>
-      <div class="story-desc">Meera closes her laptop and trusts Wispa to filter what matters. She surfaces from deep work feeling sharp, not exhausted — because her attention was never stolen.</div>
-    </div>
-  </div>
-</section>
-
-<!-- SECTION 6 — BEFORE / AFTER -->
-<section id="before-after">
-  <div class="ba-side before" id="baBefore">
-    <div class="ba-label">Before Wispa</div>
-    <div class="ba-title">The constant pull of the screen.</div>
-    <ul class="ba-items">
-      <li>87 notifications by noon</li>
-      <li>Phone in hand every 4 minutes</li>
-      <li>Half-finished thoughts, scattered focus</li>
-      <li>Exhausted by 3 PM, daily</li>
-      <li>Screen time: 7+ hours</li>
-    </ul>
-  </div>
-  <div class="ba-side after" id="baAfter">
-    <div class="ba-label">With Wispa</div>
-    <div class="ba-title">Intelligence delivered by voice. Nothing more.</div>
-    <ul class="ba-items">
-      <li>Speak, receive, move on</li>
-      <li>Phone stays in your pocket</li>
-      <li>One device for your entire day</li>
-      <li>Calm evenings, productive mornings</li>
-      <li>4.5cm round. Featherlight.</li>
-    </ul>
-  </div>
-</section>
-
-<!-- SECTION 7 — HOW IT WORKS -->
-<section id="how-it-works">
-  <div class="hiw-inner">
-    <div class="hiw-label">How It Works</div>
-    <div class="hiw-flow">
-      <div class="hiw-step" id="hiwStep1">
-        <div class="hiw-word">You speak</div>
-        <div class="hiw-sub">Just say it naturally</div>
-      </div>
-      <div class="hiw-arrow" id="hiwArrow1">→</div>
-      <div class="hiw-step" id="hiwStep2">
-        <div class="hiw-word">Wispa thinks</div>
-        <div class="hiw-sub">AI processes instantly</div>
-      </div>
-      <div class="hiw-arrow" id="hiwArrow2">→</div>
-      <div class="hiw-step" id="hiwStep3">
-        <div class="hiw-word">You get answers</div>
-        <div class="hiw-sub">No screen needed</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- SECTION 8 — DESIGN PHILOSOPHY -->
-<section id="design-philosophy">
-  <div class="dp-device-wrap" id="dpDevice">
-    <div class="dp-device">
-      <div class="dp-dot"></div>
-    </div>
-  </div>
-  <div class="dp-content" id="dpContent">
-    <div class="dp-label">Design Philosophy</div>
-    <h2 class="dp-title">Every decision<br/>was deliberate.</h2>
-    <ul class="dp-points">
-      <li>
-        <div class="dp-q">Why no screen?</div>
-        <div class="dp-a">Screens demand attention. Wispa gives it back. When you don't need to look, you're present — in conversations, in moments, in life.</div>
-      </li>
-      <li>
-        <div class="dp-q">Why so small?</div>
-        <div class="dp-a">4.5cm diameter. 1.5cm thin. It disappears — on your keychain, your bag, your collar — until you need it.</div>
-      </li>
-      <li>
-        <div class="dp-q">Why voice-first?</div>
-        <div class="dp-a">Voice is the most natural human interface. It's faster than typing, richer than tapping, and asks nothing of your hands or your eyes.</div>
-      </li>
-    </ul>
-  </div>
-</section>
-
-<!-- SECTION 9 — PRIVACY -->
-<section id="privacy">
-  <div class="privacy-header" id="privacyHeader">
-    <h2 class="privacy-title">Private by design.</h2>
-    <p class="privacy-sub">We built Wispa to serve you, not to study you. Your voice is never stored. Your data is never sold.</p>
-  </div>
-  <div class="privacy-pillars">
-    <div class="pillar" data-delay="0">
-      <div class="pillar-icon">🔒</div>
-      <div class="pillar-title">No persistent recording</div>
-      <div class="pillar-desc">Wispa listens only when activated. Audio is processed in real-time and never saved to any server.</div>
-    </div>
-    <div class="pillar" data-delay="150">
-      <div class="pillar-icon">🛡️</div>
-      <div class="pillar-title">Encrypted in transit</div>
-      <div class="pillar-desc">All communication between Wispa and the cloud uses end-to-end encryption. Always.</div>
-    </div>
-    <div class="pillar" data-delay="300">
-      <div class="pillar-icon">🚫</div>
-      <div class="pillar-title">Zero data selling</div>
-      <div class="pillar-desc">We have no advertising model. Your data has no commercial value to us — only to you.</div>
-    </div>
-  </div>
-</section>
-
-<!-- SECTION 10 — FOUNDERS -->
-<section id="founders">
-  <div class="founders-header" id="foundersHeader">
-    <div class="founders-eyebrow">The Team</div>
-    <h2 class="founders-title">Built by people who believe technology should serve humans — not the other way around.</h2>
-  </div>
-  <div class="founders-grid">
-    <div class="founder-card" data-delay="0">
-      <div class="founder-avatar">
-        <span class="founder-initials">A</span>
+<!-- ===== PROBLEM ===== -->
+<section class="py-24 md:py-32 bg-white">
+  <div class="max-w-4xl mx-auto px-6 text-center">
+    <span class="iconify text-ws-muted mx-auto mb-8" data-icon="lucide:smartphone" data-width="24"></span>
+    <h2 class="text-3xl md:text-5xl font-bold tracking-tight mb-6 sr d1 text-ws-dark text-balance">
+      We check our screens <br>
+      <span class="font-normal text-ws-muted">152 times a day.</span>
+    </h2>
+    <p class="text-ws-sub text-sm max-w-lg mx-auto leading-relaxed mb-16 sr d2">
+      A digital addiction hidden in plain sight. We reach for quick answers or notifications, only to lose minutes of intense creative focus. Wispa fixes this gracefully.
+    </p>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-3xl mx-auto sr d3">
+      <div>
+        <p class="text-5xl font-light tracking-tight text-ws-dark">4.8<span class="text-ws-muted text-xl ml-1">h</span></p>
+        <div class="w-6 h-px bg-ws-border mx-auto my-4"></div>
+        <p class="text-[10px] font-semibold text-ws-sub uppercase tracking-[0.1em]">Average daily<br>screen time</p>
       </div>
       <div>
-        <div class="founder-name">Aryan Mehta</div>
-        <div class="founder-role">Co-founder & CEO</div>
-      </div>
-      <p class="founder-quote">"I got tired of reaching for my phone every time I needed a simple answer. Wispa started as a personal frustration."</p>
-    </div>
-    <div class="founder-card" data-delay="150">
-      <div class="founder-avatar">
-        <span class="founder-initials">P</span>
+        <p class="text-5xl font-light tracking-tight text-ws-dark">152</p>
+        <div class="w-6 h-px bg-ws-border mx-auto my-4"></div>
+        <p class="text-[10px] font-semibold text-ws-sub uppercase tracking-[0.1em]">Times picking<br>up the phone</p>
       </div>
       <div>
-        <div class="founder-name">Priya Nair</div>
-        <div class="founder-role">Co-founder & CTO</div>
+        <p class="text-5xl font-light tracking-tight text-ws-dark">67<span class="text-ws-muted text-xl ml-1">%</span></p>
+        <div class="w-6 h-px bg-ws-border mx-auto my-4"></div>
+        <p class="text-[10px] font-semibold text-ws-sub uppercase tracking-[0.1em]">Feel distracted<br>daily</p>
       </div>
-      <p class="founder-quote">"The hardware was the hardest part. Making something this small feel this powerful — that took a hundred iterations."</p>
     </div>
-    <div class="founder-card" data-delay="300">
-      <div class="founder-avatar">
-        <span class="founder-initials">R</span>
+  </div>
+</section>
+
+<!-- ===== SOLUTION / THE CONCEPT ===== -->
+<section id="solution" class="py-24 md:py-32">
+  <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 md:gap-24 items-center">
+    
+    <div class="flex justify-center sr relative">
+      <div class="device" style="animation: floating 8s ease-in-out infinite reverse;">
+        <div class="mic"></div><div class="led"></div>
       </div>
+    </div>
+    
+    <div>
+      <p class="text-[10px] font-bold text-ws-muted uppercase tracking-[0.2em] mb-4 sr">The Concept</p>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight mb-6 sr d1 text-ws-dark">A quiet companion.</h2>
+      <p class="text-ws-sub text-[15px] leading-relaxed mb-10 sr d2 max-w-md">
+        Designed to be felt, not seen. A minimalist pebble you wear close to your heart. It effortlessly hears your questions, connects to advanced AI, and whispers back the answers.
+      </p>
+      
+      <div class="space-y-8 sr d3">
+        <div class="flex items-start gap-5">
+          <span class="iconify text-ws-dark mt-1" data-icon="lucide:mic" data-width="20"></span>
+          <div>
+            <p class="text-sm font-bold text-ws-dark">Micro-Acoustic Capture</p>
+            <p class="text-[13px] text-ws-sub mt-2 leading-relaxed">Studio-grade dual MEMS microphones pick up your quietest whispers, perfectly isolating voice from wind.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-5">
+          <span class="iconify text-ws-dark mt-1" data-icon="lucide:volume-2" data-width="20"></span>
+          <div>
+            <p class="text-sm font-bold text-ws-dark">Spatial Whispers</p>
+            <p class="text-[13px] text-ws-sub mt-2 leading-relaxed">The precisely tuned upward-firing speaker delivers crisp, natural-sounding AI responses meant only for you.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-5">
+          <span class="iconify text-ws-dark mt-1" data-icon="lucide:circle" data-width="20"></span>
+          <div>
+            <p class="text-sm font-bold text-ws-dark">Ambient Awareness LED</p>
+            <p class="text-[13px] text-ws-sub mt-2 leading-relaxed">A tiny, soft light pulses elegantly to let you know exactly when Wispa is listening, thinking, or speaking.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section id="how" class="py-24 md:py-32 bg-white">
+  <div class="max-w-5xl mx-auto px-6">
+    <div class="text-center mb-16">
+      <p class="text-[10px] font-bold text-ws-muted uppercase tracking-[0.2em] mb-4 sr">The Logic</p>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight sr d1 text-ws-dark">Three fluid steps.</h2>
+    </div>
+    
+    <div class="grid md:grid-cols-3 gap-8 relative items-start">
+      <!-- Logic line -->
+      <div class="hidden md:block absolute top-8 left-16 right-16 h-px bg-ws-border z-0"></div>
+      
+      <div class="text-center sr relative z-10">
+        <div class="w-16 h-16 rounded-full bg-white border border-ws-border flex items-center justify-center mx-auto mb-6 shadow-sm">
+          <span class="text-sm font-bold text-ws-dark">01</span>
+        </div>
+        <h3 class="text-[15px] font-bold text-ws-dark mb-3">You Speak</h3>
+        <p class="text-[13px] text-ws-sub leading-relaxed max-w-[240px] mx-auto">Tap the surface lightly and whisper your thought. The mics capture your intent instantly.</p>
+      </div>
+      
+      <div class="text-center sr d1 relative z-10">
+        <div class="w-16 h-16 rounded-full bg-white border border-ws-dark flex items-center justify-center mx-auto mb-6 shadow-md transition-transform hover:scale-105">
+          <span class="text-sm font-bold text-ws-dark">02</span>
+        </div>
+        <h3 class="text-[15px] font-bold text-ws-dark mb-3">Wispa Thinks</h3>
+        <p class="text-[13px] text-ws-sub leading-relaxed max-w-[240px] mx-auto">Edge processing routes your voice to massive cloud LLMs, decoding complex reasoning in milliseconds.</p>
+      </div>
+      
+      <div class="text-center sr d2 relative z-10">
+        <div class="w-16 h-16 rounded-full bg-white border border-ws-border flex items-center justify-center mx-auto mb-6 shadow-sm">
+          <span class="text-sm font-bold text-ws-dark">03</span>
+        </div>
+        <h3 class="text-[15px] font-bold text-ws-dark mb-3">You Know</h3>
+        <p class="text-[13px] text-ws-sub leading-relaxed max-w-[240px] mx-auto">A natural human-like voice delivers the answer. Hands free. Eyes up. Fully present.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section id="features" class="py-24 md:py-32 bg-ws-surface">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-16 gap-6">
       <div>
-        <div class="founder-name">Rohan Shah</div>
-        <div class="founder-role">Head of AI & Product</div>
+        <p class="text-[10px] font-bold text-ws-muted uppercase tracking-[0.2em] mb-4 sr">Capabilities</p>
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight sr d1 text-ws-dark">Minimal form.<br>Absolute power.</h2>
       </div>
-      <p class="founder-quote">"Silence is a luxury today. We wanted to build something that earns its place in your life by staying quiet."</p>
+    </div>
+    
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="card-mini p-8 sr">
+        <span class="iconify text-ws-dark mb-6" data-icon="lucide:mic" data-width="22"></span>
+        <h3 class="text-sm font-bold text-ws-dark mb-2">Acoustic Isolation</h3>
+        <p class="text-[13px] text-ws-sub leading-relaxed">Whisper-level detection with isolated microphones cutting out wind and ambient noise.</p>
+      </div>
+      
+      <div class="card-mini p-8 sr d1">
+        <span class="iconify text-ws-dark mb-6" data-icon="lucide:brain" data-width="22"></span>
+        <h3 class="text-sm font-bold text-ws-dark mb-2">Omnipotent Intelligence</h3>
+        <p class="text-[13px] text-ws-sub leading-relaxed">Dynamically powered by world-class LLMs to provide flawless knowledge and reasoning.</p>
+      </div>
+      
+      <div class="card-mini p-8 sr d2">
+        <span class="iconify text-ws-dark mb-6" data-icon="lucide:bell-ring" data-width="22"></span>
+        <h3 class="text-sm font-bold text-ws-dark mb-2">Curated Notifications</h3>
+        <p class="text-[13px] text-ws-sub leading-relaxed">Wispa intelligently filters your digital life. Only truly critical pings are spoken to you.</p>
+      </div>
+      
+      <div class="card-mini p-8 sr d1">
+        <span class="iconify text-ws-dark mb-6" data-icon="lucide:languages" data-width="22"></span>
+        <h3 class="text-sm font-bold text-ws-dark mb-2">Real-time Polyglot</h3>
+        <p class="text-[13px] text-ws-sub leading-relaxed">Seamless translation in 40+ dialects. Speak naturally, Wispa translates instantly to your listener.</p>
+      </div>
+      
+      <div class="card-mini p-8 sr d2">
+        <span class="iconify text-ws-dark mb-6" data-icon="lucide:battery" data-width="22"></span>
+        <h3 class="text-sm font-bold text-ws-dark mb-2">Perpetual Energy</h3>
+        <p class="text-[13px] text-ws-sub leading-relaxed">Ultra-efficient edge architecture allows the tiny internal cell to run actively for 24 hours.</p>
+      </div>
+      
+      <div class="card-mini p-8 sr d3">
+        <span class="iconify text-ws-dark mb-6" data-icon="lucide:fingerprint" data-width="22"></span>
+        <h3 class="text-sm font-bold text-ws-dark mb-2">Absolute Privacy</h3>
+        <p class="text-[13px] text-ws-sub leading-relaxed">Your voice is processed securely and scrubbed. There are no cameras, and no data selling.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- SECTION 11 — PRE-ORDER -->
-<section id="preorder">
-  <h2 class="preorder-title" id="preorderTitle">Be first. Be free.</h2>
-  <p class="preorder-sub" id="preorderSub">Join the early access waitlist. Limited units. No noise promised.</p>
-  <div class="preorder-form" id="preorderForm">
-    <input type="email" class="preorder-input" placeholder="Your email address" />
-    <button class="preorder-btn">Reserve My Wispa</button>
+<!-- ===== USE CASES (SCROLL) ===== -->
+<section class="py-24 md:py-32">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="mb-12">
+      <h2 class="text-2xl font-bold tracking-tight sr d1 text-ws-dark">Seamless integration.</h2>
+    </div>
+    
+    <div class="uc-track -mx-6 px-6 sr d2 pb-8">
+      
+      <div class="uc-item">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-full bg-white border border-ws-border flex items-center justify-center">
+            <span class="iconify text-ws-dark" data-icon="lucide:graduation-cap"></span>
+          </div>
+          <p class="text-[10px] font-bold uppercase tracking-[0.1em] text-ws-sub">Education</p>
+        </div>
+        <h3 class="text-[15px] font-bold text-ws-dark mb-3">"Summarize this lecture"</h3>
+        <p class="text-[13px] text-ws-sub leading-relaxed">Record live classes and instantly receive compiled voice summaries and study guides while walking home.</p>
+      </div>
+      
+      <div class="uc-item">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-full bg-white border border-ws-border flex items-center justify-center">
+            <span class="iconify text-ws-dark" data-icon="lucide:briefcase"></span>
+          </div>
+          <p class="text-[10px] font-bold uppercase tracking-[0.1em] text-ws-sub">Professional</p>
+        </div>
+        <h3 class="text-[15px] font-bold text-ws-dark mb-3">"Draft email to Aryan"</h3>
+        <p class="text-[13px] text-ws-sub leading-relaxed">Compose flawless responses, check your schedule, and set reminders without opening your laptop.</p>
+      </div>
+      
+      <div class="uc-item">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-full bg-white border border-ws-border flex items-center justify-center">
+            <span class="iconify text-ws-dark" data-icon="lucide:dumbbell"></span>
+          </div>
+          <p class="text-[10px] font-bold uppercase tracking-[0.1em] text-ws-sub">Wellness</p>
+        </div>
+        <h3 class="text-[15px] font-bold text-ws-dark mb-3">"Log 200 calories"</h3>
+        <p class="text-[13px] text-ws-sub leading-relaxed">Track metrics effortlessly mid-workout. No need to wipe sweaty hands to interact with a screen app.</p>
+      </div>
+      
+      <div class="uc-item">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-full bg-white border border-ws-border flex items-center justify-center">
+            <span class="iconify text-ws-dark" data-icon="lucide:plane"></span>
+          </div>
+          <p class="text-[10px] font-bold uppercase tracking-[0.1em] text-ws-sub">Travel</p>
+        </div>
+        <h3 class="text-[15px] font-bold text-ws-dark mb-3">"Say 'Thank you' in French"</h3>
+        <p class="text-[13px] text-ws-sub leading-relaxed">On-the-fly conversational translation lets you connect with locals naturally, maintaining eye contact.</p>
+      </div>
+      
+      <!-- padding element for scroll end -->
+      <div class="flex-shrink-0 w-2"></div>
+    </div>
   </div>
-  <p class="preorder-note" id="preorderNote">No spam. No noise. Just a quiet notification when you're in.</p>
 </section>
 
-<!-- SECTION 12 — FINAL CTA -->
-<section id="final-cta">
-  <div class="final-cta-bg"></div>
-  <div class="final-device-glow" id="finalDevice">
-    <div class="final-dot"></div>
+<!-- ===== DEVICE ANATOMY ===== -->
+<section id="specs" class="py-24 md:py-32 bg-white border-y border-ws-border">
+  <div class="max-w-4xl mx-auto px-6">
+    <div class="text-center mb-16">
+      <p class="text-[10px] font-bold text-ws-muted uppercase tracking-[0.2em] mb-4 sr">Hardware</p>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight sr d1 text-ws-dark">Anatomy of Wispa.</h2>
+    </div>
+    
+    <div class="sr d2">
+      <div class="spec-r"><span class="text-[13px] text-ws-sub font-medium uppercase tracking-widest">Dimensions</span><span class="text-sm font-semibold text-ws-dark">40mm Diameter, 8mm thin</span></div>
+      <div class="spec-r"><span class="text-[13px] text-ws-sub font-medium uppercase tracking-widest">Weight</span><span class="text-sm font-semibold text-ws-dark">18 grams</span></div>
+      <div class="spec-r"><span class="text-[13px] text-ws-sub font-medium uppercase tracking-widest">Enclosure</span><span class="text-sm font-semibold text-ws-dark">Sandblasted Recycled Aluminum</span></div>
+      <div class="spec-r"><span class="text-[13px] text-ws-sub font-medium uppercase tracking-widest">Acoustics</span><span class="text-sm font-semibold text-ws-dark">Dual MEMS Arrays / Mono Driver</span></div>
+      <div class="spec-r"><span class="text-[13px] text-ws-sub font-medium uppercase tracking-widest">Computing</span><span class="text-sm font-semibold text-ws-dark">Wispa N1 Edge SoC</span></div>
+      <div class="spec-r"><span class="text-[13px] text-ws-sub font-medium uppercase tracking-widest">Connectivity</span><span class="text-sm font-semibold text-ws-dark">Bluetooth 5.3 Low Energy</span></div>
+      <div class="spec-r"><span class="text-[13px] text-ws-sub font-medium uppercase tracking-widest">Durability</span><span class="text-sm font-semibold text-ws-dark">IPX4 Water & Dust Resistant</span></div>
+    </div>
   </div>
-  <h2 class="final-title" id="finalTitle">Experience intelligence without distraction.</h2>
-  <a href="#preorder" class="final-btn" id="finalBtn">Pre-order Wispa</a>
 </section>
 
-<!-- FOOTER -->
-<footer>
-  <div class="footer-grid">
-    <div>
-      <div class="footer-brand-name">Wispa</div>
-      <p class="footer-brand-desc">A voice-first AI companion designed to give you back your focus, your presence, and your life. Less screen. More of everything else.</p>
-      <ul class="footer-social">
-        <li><a href="#">Twitter</a></li>
-        <li><a href="#">Instagram</a></li>
-        <li><a href="#">LinkedIn</a></li>
-      </ul>
+<!-- ===== TEAM / FOUNDERS ===== -->
+<section class="py-24 md:py-32">
+  <div class="max-w-4xl mx-auto px-6">
+    <div class="text-center mb-16">
+      <p class="text-[10px] font-bold text-ws-muted uppercase tracking-[0.2em] mb-4 sr">The Creators</p>
+      <h2 class="text-2xl md:text-3xl font-bold tracking-tight sr d1 text-ws-dark">Built to restore focus.</h2>
     </div>
-    <div>
-      <div class="footer-col-title">Product</div>
-      <ul class="footer-links">
-        <li><a href="#">How It Works</a></li>
-        <li><a href="#">Features</a></li>
-        <li><a href="#">Design</a></li>
-        <li><a href="#">Pre-order</a></li>
-      </ul>
-    </div>
-    <div>
-      <div class="footer-col-title">Company</div>
-      <ul class="footer-links">
-        <li><a href="#">About</a></li>
-        <li><a href="#">Team</a></li>
-        <li><a href="#">Press</a></li>
-        <li><a href="#">Careers</a></li>
-      </ul>
-    </div>
-    <div>
-      <div class="footer-col-title">Contact</div>
-      <ul class="footer-links">
-        <li><a href="mailto:hello@wispa.ai">hello@wispa.ai</a></li>
-        <li><a href="#">Support</a></li>
-        <li><a href="#">Partnerships</a></li>
-        <li><a href="#">Investors</a></li>
-      </ul>
+    
+    <div class="grid sm:grid-cols-3 gap-10 sr d2">
+      <div class="text-center">
+        <div class="w-20 h-20 rounded-full mx-auto mb-5 border border-ws-border p-1 overflow-hidden transition-transform duration-500 hover:scale-105">
+          <img src="aryan.png" alt="Aryan" class="w-full h-full object-cover rounded-full filter grayscale hover:grayscale-0 transition-all duration-500">
+        </div>
+        <h3 class="text-sm font-bold text-ws-dark mb-1">Aryan Patel</h3>
+        <p class="text-[10px] font-bold text-ws-muted uppercase tracking-[0.1em] mb-4">Founder & CEO</p>
+        <p class="text-[12px] text-ws-sub leading-relaxed max-w-[200px] mx-auto text-balance">The visionary establishing the long-term trajectory and purpose of screenless computing.</p>
+      </div>
+      
+      <div class="text-center">
+        <div class="w-20 h-20 rounded-full mx-auto mb-5 border border-ws-border p-1 overflow-hidden transition-transform duration-500 hover:scale-105">
+          <img src="harsh.png" alt="Harshvardhan" class="w-full h-full object-cover rounded-full filter grayscale hover:grayscale-0 transition-all duration-500">
+        </div>
+        <h3 class="text-sm font-bold text-ws-dark mb-1">Harshvardhan Vaghela</h3>
+        <p class="text-[10px] font-bold text-ws-muted uppercase tracking-[0.1em] mb-4">CTO</p>
+        <p class="text-[12px] text-ws-sub leading-relaxed max-w-[200px] mx-auto text-balance">The engineering mind mapping the complex interplay of hardware acoustics and LLMs.</p>
+      </div>
+      
+      <div class="text-center">
+        <div class="w-20 h-20 rounded-full mx-auto mb-5 border border-ws-border p-1 overflow-hidden transition-transform duration-500 hover:scale-105">
+          <img src="yash.png" alt="Yash" class="w-full h-full object-cover rounded-full filter grayscale hover:grayscale-0 transition-all duration-500">
+        </div>
+        <h3 class="text-sm font-bold text-ws-dark mb-1">Yash Valand</h3>
+        <p class="text-[10px] font-bold text-ws-muted uppercase tracking-[0.1em] mb-4">COO</p>
+        <p class="text-[12px] text-ws-sub leading-relaxed max-w-[200px] mx-auto text-balance">The aesthetic curator of the minimalist flow, brand identity, and the fluid user experience.</p>
+      </div>
     </div>
   </div>
-  <div class="footer-bottom">
-    <span class="footer-copy">© 2025 Wispa Technologies. All rights reserved.</span>
-    <ul class="footer-legal">
-      <li><a href="#">Privacy Policy</a></li>
-      <li><a href="#">Terms of Service</a></li>
-      <li><a href="#">Cookie Policy</a></li>
-    </ul>
+</section>
+
+
+
+<!-- ===== FINAL CTA ===== -->
+<section id="order" class="py-32 md:py-48 bg-ws-dark text-white text-center border-t-8 border-white">
+  <div class="max-w-2xl mx-auto px-6">
+    <div class="w-20 h-20 rounded-full mx-auto border border-white/20 flex flex-col items-center justify-center mb-10 sr">
+      <div class="wave h-6 mb-0">
+        <div class="wave-line bg-white h-3"></div>
+        <div class="wave-line bg-white h-6"></div>
+        <div class="wave-line bg-white h-3"></div>
+      </div>
+    </div>
+    
+    <h2 class="text-3xl md:text-5xl font-light tracking-tight mb-6 sr d1">
+      Free your eyes.
+    </h2>
+    <p class="text-white/60 text-sm max-w-sm mx-auto leading-relaxed mb-12 sr d2">Join the quiet revolution. Pre-order now to secure exclusive early inventory placement.</p>
+    
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto mb-6 sr d3">
+      <input type="email" id="cta-email" placeholder="Your email address" class="w-full sm:flex-1 px-6 py-4 rounded-full bg-white/5 border border-white/10 text-[13px] text-white placeholder-white/40 focus:outline-none focus:border-white/30 transition-colors">
+      <button id="cta-btn" class="bg-white text-ws-dark px-8 py-4 rounded-full text-[13px] font-bold whitespace-nowrap hover:scale-105 transition-transform w-full sm:w-auto">Acquire Unit</button>
+    </div>
+    <div id="cta-msg" class="hidden mt-6 text-[11px] text-ws-accent font-bold uppercase tracking-widest">✓ Position secured.</div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="bg-white pt-20 pb-10">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-12 pb-16 border-b border-ws-border">
+      
+      <!-- Brand -->
+      <div class="col-span-2 md:col-span-1">
+        <div class="flex items-center gap-2 mb-6">
+          <div class="w-2 h-2 rounded-full bg-ws-dark"></div>
+          <span class="font-bold text-sm tracking-widest uppercase text-ws-dark">Wispa</span>
+        </div>
+        <p class="text-[12px] text-ws-sub leading-relaxed max-w-[200px]">The screenless companion crafted to restore your attention and humanity.</p>
+      </div>
+      
+      <!-- Index -->
+      <div>
+        <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-ws-muted mb-6">Index</p>
+        <ul class="space-y-4">
+          <li><a href="#hero" class="text-[12px] font-medium text-ws-sub hover:text-ws-dark transition-colors">Home</a></li>
+          <li><a href="#solution" class="text-[12px] font-medium text-ws-sub hover:text-ws-dark transition-colors">Hardware</a></li>
+          <li><a href="#pricing" class="text-[12px] font-medium text-ws-sub hover:text-ws-dark transition-colors">Pricing</a></li>
+        </ul>
+      </div>
+      
+      <!-- Connect -->
+      <div>
+        <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-ws-muted mb-6">Connect</p>
+        <ul class="space-y-4">
+          <li><a href="mailto:hello@wispa.ai" class="text-[12px] font-medium text-ws-sub hover:text-ws-dark transition-colors">hello@wispa.ai</a></li>
+          <li><a href="https://twitter.com/wispa_ai" class="text-[12px] font-medium text-ws-sub hover:text-ws-dark transition-colors">Twitter (X)</a></li>
+          <li><a href="#" class="text-[12px] font-medium text-ws-sub hover:text-ws-dark transition-colors">Instagram</a></li>
+        </ul>
+      </div>
+      
+      <!-- Studio -->
+      <div>
+        <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-ws-muted mb-6">Studio</p>
+        <p class="text-[12px] font-medium text-ws-sub leading-relaxed">
+          Ahmedabad,<br>
+          Gujarat, India
+        </p>
+      </div>
+    </div>
+    
+    <div class="pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+      <p class="text-[11px] font-medium text-ws-muted">© 2026 Wispa AI. All rights reserved.</p>
+      <p class="text-[11px] font-medium text-ws-muted">Designed in harmony.</p>
+    </div>
   </div>
 </footer>
 
+<!-- Toasts -->
+<div id="toasts" class="fixed bottom-8 right-8 z-50 flex flex-col gap-3"></div>
+
 <script>
-/* ─────────────────────────────────────────────────
-   CURSOR
-───────────────────────────────────────────────── */
-const cursor = document.getElementById('cursor');
-const cursorRing = document.getElementById('cursor-ring');
-let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('DOMContentLoaded', () => {
 
-document.addEventListener('mousemove', e => {
-  mx = e.clientX; my = e.clientY;
-  cursor.style.left = mx + 'px';
-  cursor.style.top = my + 'px';
-});
+  // ===== PRELOADER =====
+  const pre = document.getElementById('preloader');
+  window.addEventListener('load', () => setTimeout(() => pre.classList.add('hide'), 1800));
+  setTimeout(() => pre.classList.add('hide'), 4000);
 
-function animateCursor() {
-  rx += (mx - rx) * 0.12;
-  ry += (my - ry) * 0.12;
-  cursorRing.style.left = rx + 'px';
-  cursorRing.style.top = ry + 'px';
-  requestAnimationFrame(animateCursor);
-}
-animateCursor();
+  // ===== SCROLL REVEAL =====
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.sr').forEach(el => obs.observe(el));
 
-document.querySelectorAll('a, button, input').forEach(el => {
-  el.addEventListener('mouseenter', () => {
-    cursorRing.style.width = '56px';
-    cursorRing.style.height = '56px';
-    cursor.style.transform = 'translate(-50%, -50%) scale(0.4)';
-  });
-  el.addEventListener('mouseleave', () => {
-    cursorRing.style.width = '36px';
-    cursorRing.style.height = '36px';
-    cursor.style.transform = 'translate(-50%, -50%) scale(1)';
-  });
-});
-
-/* ─────────────────────────────────────────────────
-   SCROLL OBSERVER
-───────────────────────────────────────────────── */
-const obs = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
+  // ===== NAVBAR =====
+  const nav = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 40) {
+      nav.style.background = 'rgba(253,253,252,0.9)';
+      nav.style.backdropFilter = 'blur(12px)';
+      nav.style.borderBottom = '1px solid rgba(0,0,0,0.05)';
+    } else {
+      nav.style.background = 'transparent';
+      nav.style.backdropFilter = 'none';
+      nav.style.borderBottom = '1px solid transparent';
     }
+  }, { passive: true });
+
+  // ===== MOBILE MENU =====
+  const mBtn = document.getElementById('mob-btn');
+  const mMenu = document.getElementById('mob-menu');
+  let open = false;
+  mBtn.addEventListener('click', () => {
+    open = !open;
+    mMenu.classList.toggle('hidden', !open);
+    mBtn.innerHTML = open
+      ? '<span class="iconify" data-icon="lucide:x" data-width="22"></span>'
+      : '<span class="iconify" data-icon="lucide:menu" data-width="22"></span>';
   });
-}, { threshold: 0.2, rootMargin: '0px 0px -60px 0px' });
-
-// Text elements
-['transitionText', 'transitionDevice', 'storyHeading', 'baBefore', 'baAfter',
- 'privacyHeader', 'foundersHeader', 'preorderTitle', 'preorderSub', 'preorderForm',
- 'preorderNote', 'finalDevice', 'finalTitle', 'finalBtn', 'dpDevice', 'dpContent'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) obs.observe(el);
-});
-
-// Story cards with stagger
-document.querySelectorAll('.story-card, .pillar, .founder-card, .convo-item, .hiw-step, .hiw-arrow').forEach(el => {
-  const delay = el.dataset.delay || 0;
-  el.style.transitionDelay = delay + 'ms';
-  obs.observe(el);
-});
-
-/* ─────────────────────────────────────────────────
-   NOISE SECTION — NOTIFICATIONS
-───────────────────────────────────────────────── */
-const notifications = [
-  { icon: '💬', color: '#e8f4fd', app: 'WhatsApp', msg: 'You have 14 unread messages', time: '2m ago' },
-  { icon: '📧', color: '#fef3e8', app: 'Gmail', msg: 'Meeting notes from 3 threads', time: '4m ago' },
-  { icon: '📱', color: '#f0eaff', app: 'Instagram', msg: 'Sarah liked your photo', time: '5m ago' },
-  { icon: '🔔', color: '#e8fdf0', app: 'Slack', msg: '#design-team: 7 new messages', time: '6m ago' },
-  { icon: '📰', color: '#fdeaea', app: 'News', msg: 'Breaking: Market volatility...', time: '8m ago' },
-  { icon: '📅', color: '#e8f4fd', app: 'Calendar', msg: 'Meeting in 15 minutes', time: '10m ago' },
-  { icon: '🎵', color: '#fff8e8', app: 'Spotify', msg: 'New release from your artist', time: '12m ago' },
-];
-
-const positions = [
-  { top: '5%', left: '5%' }, { top: '10%', right: '5%' },
-  { top: '30%', left: '2%' }, { top: '25%', right: '2%' },
-  { top: '50%', left: '8%' }, { top: '45%', right: '8%' },
-  { top: '70%', left: '3%' },
-];
-
-const noiseContainer = document.getElementById('noiseContainer');
-const noiseStatement = document.getElementById('noiseStatement');
-let noiseCards = [];
-
-function buildNotifCard(notif, pos) {
-  const card = document.createElement('div');
-  card.className = 'notification-card';
-  Object.assign(card.style, pos);
-  card.innerHTML = `
-    <div class="notif-icon" style="background:${notif.color}">${notif.icon}</div>
-    <div class="notif-content">
-      <div class="notif-app">${notif.app}</div>
-      <div class="notif-msg">${notif.msg}</div>
-    </div>
-    <div class="notif-time">${notif.time}</div>`;
-  return card;
-}
-
-const noiseObs = new IntersectionObserver(entries => {
-  if (entries[0].isIntersecting) {
-    runNoiseSequence();
-    noiseObs.disconnect();
-  }
-}, { threshold: 0.3 });
-noiseObs.observe(noiseContainer);
-
-function runNoiseSequence() {
-  notifications.forEach((notif, i) => {
-    setTimeout(() => {
-      const card = buildNotifCard(notif, positions[i]);
-      noiseContainer.appendChild(card);
-      card.style.animation = 'notifIn 0.5s ease forwards';
-      card.style.opacity = '1';
-      noiseCards.push(card);
-    }, i * 400);
-  });
-
-  setTimeout(() => {
-    noiseCards.forEach((card, i) => {
-      setTimeout(() => {
-        card.style.animation = 'notifOut 0.8s ease forwards';
-      }, i * 80);
+  mMenu.querySelectorAll('.mob-link, .btn-primary').forEach(a => {
+    a.addEventListener('click', () => {
+      open = false; mMenu.classList.add('hidden');
+      mBtn.innerHTML = '<span class="iconify" data-icon="lucide:menu" data-width="22"></span>';
     });
-  }, notifications.length * 400 + 1200);
+  });
 
-  setTimeout(() => {
-    noiseStatement.classList.add('visible');
-  }, notifications.length * 400 + 2400);
-}
+  // ===== CTA =====
+  const cBtn = document.getElementById('cta-btn');
+  const cEmail = document.getElementById('cta-email');
+  const cMsg = document.getElementById('cta-msg');
+  cBtn.addEventListener('click', () => {
+    const v = cEmail.value.trim();
+    if (!v || !v.includes('@') || !v.includes('.')) {
+      toast('Please enter a valid email.', 'err');
+      cEmail.focus(); return;
+    }
+    cBtn.textContent = 'Processing...';
+    cBtn.disabled = true;
+    setTimeout(() => {
+      cBtn.textContent = 'Acquire Unit';
+      cBtn.disabled = false;
+      cEmail.value = '';
+      cMsg.classList.remove('hidden');
+      toast('Reservation acquired securely.', 'ok');
+      setTimeout(() => cMsg.classList.add('hidden'), 4000);
+    }, 1200);
+  });
+  cEmail.addEventListener('keypress', e => { if (e.key === 'Enter') cBtn.click(); });
 
-/* ─────────────────────────────────────────────────
-   PREORDER FORM
-───────────────────────────────────────────────── */
-document.querySelector('.preorder-btn')?.addEventListener('click', () => {
-  const input = document.querySelector('.preorder-input');
-  if (!input) return;
-  const email = input.value.trim();
-  if (!email || !email.includes('@')) {
-    input.style.borderColor = '#ff6b6b';
-    setTimeout(() => { input.style.borderColor = ''; }, 2000);
-    return;
+  // ===== TOAST =====
+  function toast(msg, type) {
+    const c = document.getElementById('toasts');
+    const t = document.createElement('div');
+    const color = type === 'err' ? '#EF4444' : '#1A1A1A';
+    t.style.cssText = `background:#fff; border:1px solid #EAEAE6; color:${color}; font-size:12px; font-weight:600; padding:16px 24px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.08); transform:translateX(120%); transition:transform .4s cubic-bezier(.16,1,.3,1),opacity .4s ease`;
+    t.textContent = msg;
+    c.appendChild(t);
+    requestAnimationFrame(() => { t.style.transform = 'translateX(0)'; });
+    setTimeout(() => {
+      t.style.transform = 'translateX(120%)';
+      t.style.opacity = '0';
+      setTimeout(() => t.remove(), 400);
+    }, 3000);
   }
-  input.disabled = true;
-  document.querySelector('.preorder-btn').textContent = 'You\'re on the list ✓';
-  document.querySelector('.preorder-btn').style.opacity = '0.7';
-  document.querySelector('.preorder-btn').disabled = true;
-  input.value = '';
-  input.placeholder = 'See you soon.';
 });
 </script>
-
 </body>
 </html>
